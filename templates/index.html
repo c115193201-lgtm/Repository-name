@@ -11,14 +11,6 @@
             padding: 20px;
             color: #2c3e50;
         }
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -38,7 +30,7 @@
             margin-right: 10px;
         }
         select, button {
-            padding: 8px 12px;
+            padding: 10px 15px;
             font-size: 16px;
             border-radius: 5px;
             border: 1px solid #ccc;
@@ -55,12 +47,12 @@
         #result {
             margin-top: 15px;
             font-weight: bold;
-            color: #e74c3c;
-            font-size: 18px;
+            color: #c0392b;
+            font-size: 20px;
             background-color: #fadbd8;
-            padding: 10px;
+            padding: 15px;
             border-radius: 5px;
-            display: inline-block;
+            border-left: 5px solid #e74c3c;
         }
         .menu-table {
             width: 100%;
@@ -81,7 +73,7 @@
 <body>
 
     <div class="container">
-        <header>
+        <header style="text-align: center; margin-bottom: 30px;">
             <h1>🥤 DrinkHelper 智慧手搖飲訂閱</h1>
             <p>為你量身打造的專屬手搖飲推薦與智慧菜單系統！</p>
         </header>
@@ -110,8 +102,9 @@
                 </select>
             </div>
             <button type="button" onclick="recommendDrink()">幫我推薦飲品！</button>
-            <br>
-            <div id="result">請選擇你的喜好並點擊按鈕！</div>
+            
+            <!-- 推薦結果顯示區 -->
+            <div id="result">點擊上方按鈕，立刻為您推薦命定手搖飲！</div>
         </div>
 
         <!-- 完整豐富菜單區塊 -->
@@ -123,6 +116,12 @@
                     <th>飲品名稱</th>
                     <th>推薦甜度/冰塊</th>
                     <th>參考價格</th>
+                </tr>
+                <tr>
+                    <td>經典特調</td>
+                    <td>招牌多多綠</td>
+                    <td>半糖 / 少冰</td>
+                    <td>$55</td>
                 </tr>
                 <tr>
                     <td>咀嚼系</td>
@@ -143,28 +142,10 @@
                     <td>$45</td>
                 </tr>
                 <tr>
-                    <td>清爽茶飲</td>
-                    <td>高山金萱烏龍</td>
-                    <td>無糖 / 微冰</td>
-                    <td>$40</td>
-                </tr>
-                <tr>
                     <td>濃郁奶茶</td>
                     <td>鐵觀音拿鐵</td>
                     <td>微糖 / 少冰</td>
                     <td>$55</td>
-                </tr>
-                <tr>
-                    <td>濃郁奶茶</td>
-                    <td>皇家阿薩姆奶茶</td>
-                    <td>半糖 / 少冰</td>
-                    <td>$50</td>
-                </tr>
-                <tr>
-                    <td>果茶特調</td>
-                    <td>翡翠檸檬海燕窩</td>
-                    <td>半糖 / 正常冰</td>
-                    <td>$60</td>
                 </tr>
                 <tr>
                     <td>果茶特調</td>
@@ -181,18 +162,22 @@
             const sweet = document.getElementById('sweetness').value;
             const ice = document.getElementById('ice').value;
             
-            const options = [
-                `【清爽解渴】${sweet}、${ice} 的「四季春青茶」`,
-                `【咀嚼口感】${sweet}、${ice} 的「芋頭鮮奶波波」`,
-                `【濃郁茶香】${sweet}、${ice} 的「鐵觀音拿鐵」`,
-                `【酸甜果香】${sweet}、${ice} 的「翡翠檸檬海燕窩」`,
-                `【經典不敗】${sweet}、${ice} 的「黑糖珍珠鮮奶」`,
-                `【人氣特調】${sweet}、${ice} 的「百香雙響炮」`,
-                【溫潤茶韻】${sweet}、${ice} 的「高山金萱烏龍」
+            // 包含多多綠在內的飲料清單
+            const drinks = [
+                "招牌多多綠",
+                "四季春青茶 + 珍珠",
+                "芋頭鮮奶波波",
+                "鐵觀音拿鐵",
+                "黑糖珍珠鮮奶",
+                "百香雙響炮"
             ];
 
-            const selected = options[Math.floor(Math.random() * options.length)];
-            document.getElementById('result').innerText = `🎉 推薦你喝：${selected}！`;
+            // 隨機挑選一個
+            const randomDrink = drinks[Math.floor(Math.random() * drinks.length)];
+            
+            // 強制將結果寫入網頁
+            const resultBox = document.getElementById('result');
+            resultBox.innerText = `🎉 推薦你喝：${sweet}、${ice} 的「${randomDrink}」！`;
         }
     </script>
 
