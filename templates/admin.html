@@ -1,555 +1,354 @@
 
-
 <!DOCTYPE html>
-
 <html lang="zh-TW">
-
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>DrinkHelper 店家管理後台</title>
 
 <style>
-
-* {
-
-    box-sizing: border-box;
-
-}
+* { box-sizing: border-box; }
 
 body {
-
     margin: 0;
-
+    padding: 20px;
     font-family: Arial, "Microsoft JhengHei", sans-serif;
-
-    background: #f7f3ef;
-
-    color: #49372d;
-
+    background: #fff8f0;
+    color: #49382e;
 }
 
 header {
-
-    background: #8b6046;
-
+    background: #8b5e3c;
     color: white;
-
     padding: 25px;
-
+    border-radius: 12px;
     text-align: center;
-
-}
-
-header h1 {
-
-    margin: 0;
-
-}
-
-header p {
-
-    margin-bottom: 0;
-
 }
 
 .container {
-
     max-width: 1100px;
-
     margin: 25px auto;
-
-    padding: 15px;
-
 }
 
 .stats {
-
     display: grid;
-
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-
     gap: 15px;
-
+    margin-bottom: 25px;
 }
 
 .card {
-
     background: white;
-
-    padding: 22px;
-
+    padding: 20px;
     border-radius: 12px;
-
     box-shadow: 0 3px 10px #00000010;
-
 }
 
 .card h3 {
-
-    color: #8b6046;
-
+    color: #92745e;
     margin-top: 0;
-
 }
 
 .number {
-
-    font-size: 30px;
-
+    font-size: 28px;
     font-weight: bold;
-
+    color: #8b5e3c;
 }
 
-.section {
-
+.table-box {
     background: white;
-
-    margin-top: 25px;
-
-    padding: 22px;
-
+    padding: 20px;
     border-radius: 12px;
-
     overflow-x: auto;
-
-}
-
-h2 {
-
-    color: #8b6046;
-
 }
 
 table {
-
     width: 100%;
-
     border-collapse: collapse;
-
-    min-width: 750px;
-
+    min-width: 850px;
 }
 
 th, td {
-
     padding: 13px;
-
+    border-bottom: 1px solid #eee0d3;
     text-align: center;
-
-    border-bottom: 1px solid #eee;
-
 }
 
 th {
-
-    background: #fff3e6;
-
+    background: #fff0df;
+    color: #70482e;
 }
 
 select {
-
     padding: 8px;
-
-    border-radius: 7px;
-
-    border: 1px solid #ddd;
-
+    border: 1px solid #d8c5b5;
+    border-radius: 6px;
 }
 
 button {
-
-    padding: 9px 13px;
-
-    border: none;
-
-    border-radius: 7px;
-
-    background: #8b6046;
-
+    background: #8b5e3c;
     color: white;
-
+    border: none;
+    padding: 9px 14px;
+    border-radius: 7px;
     cursor: pointer;
-
 }
 
 button:hover {
-
-    background: #68452f;
-
+    background: #70482e;
 }
 
-.delete {
-
-    background: #c65b50;
-
+.status {
+    font-weight: bold;
 }
 
 .empty {
-
     text-align: center;
-
+    padding: 30px;
     color: #999;
-
-    padding: 25px;
-
 }
 
-footer {
-
-    text-align: center;
-
-    padding: 20px;
-
-    color: #888;
-
+#message {
+    margin: 12px 0;
+    color: #8b5e3c;
 }
 
+@media (max-width: 600px) {
+    body { padding: 10px; }
+    header { padding: 18px; }
+}
 </style>
-
 </head>
 
 <body>
 
 <header>
-
-    <h1>🏪 DrinkHelper 店家管理後台</h1>
-
-    <p>訂單管理與營業狀況總覽</p>
-
+    <h1>🥤 DrinkHelper 店家管理後台</h1>
+    <p>智慧飲料店訂單管理系統</p>
 </header>
 
 <div class="container">
 
     <div class="stats">
-
         <div class="card">
-
-            <h3>📋 今日訂單</h3>
-
+            <h3>總訂單數</h3>
             <div class="number" id="totalOrders">0</div>
-
-            <p>累積訂單數量</p>
-
         </div>
 
         <div class="card">
-
-            <h3>💰 今日營業額</h3>
-
-            <div class="number" id="totalMoney">$0</div>
-
-            <p>已接收訂單金額</p>
-
+            <h3>預估營業額</h3>
+            <div class="number" id="totalRevenue">$0</div>
         </div>
 
         <div class="card">
-
-            <h3>⏳ 待處理訂單</h3>
-
+            <h3>製作中</h3>
             <div class="number" id="pendingOrders">0</div>
-
-            <p>等待店家處理</p>
-
         </div>
 
         <div class="card">
-
-            <h3>✅ 已完成訂單</h3>
-
+            <h3>已完成</h3>
             <div class="number" id="finishedOrders">0</div>
-
-            <p>完成製作的訂單</p>
-
         </div>
-
     </div>
 
-    <div class="section">
+    <div class="table-box">
+        <h2>📋 顧客訂單管理</h2>
 
-        <h2>📦 顧客訂單管理</h2>
+        <button onclick="loadOrders()">重新整理訂單</button>
 
-        <button onclick="loadOrders()">🔄 重新整理訂單</button>
+        <p id="message">正在載入訂單...</p>
 
         <table>
-
             <thead>
-
                 <tr>
-
                     <th>訂單編號</th>
-
                     <th>顧客姓名</th>
-
-                    <th>飲料名稱</th>
-
+                    <th>飲料</th>
                     <th>甜度</th>
-
                     <th>冰量</th>
-
-                    <th>容量</th>
-
+                    <th>杯型</th>
                     <th>配料</th>
-
                     <th>數量</th>
-
-                    <th>金額</th>
-
                     <th>備註</th>
-
-                    <th>訂單狀態</th>
-
-                    <th>操作</th>
-
+                    <th>狀態</th>
+                    <th>時間</th>
                 </tr>
-
             </thead>
 
-            <tbody id="orderList">
-
+            <tbody id="orderTable">
                 <tr>
-
-                    <td colspan="12" class="empty">
-
-                        目前沒有訂單
-
-                    </td>
-
+                    <td colspan="11" class="empty">目前沒有訂單</td>
                 </tr>
-
             </tbody>
-
         </table>
-
-    </div>
-
-    <div class="section">
-
-        <h2>📊 訂單狀態說明</h2>
-
-        <p>🟡 待處理：顧客剛送出的訂單</p>
-
-        <p>🔵 製作中：店家正在準備飲料</p>
-
-        <p>🟢 已完成：飲料製作完成</p>
-
-        <p>🔴 已取消：訂單取消</p>
-
     </div>
 
 </div>
 
-<footer>
-
-    DrinkHelper 智慧飲料店 © 2026
-
-</footer>
-
 <script>
+const prices = {
+    "青檸烏龍": 45,
+    "桂花青茶": 35,
+    "四季春茶": 30,
+    "冷泡金萱": 40,
+    "鮮橙綠茶": 55,
+    "多多綠": 50,
+    "葡萄柚綠": 55,
+    "荔枝烏龍": 50,
+    "金桔檸檬": 45,
+    "百香果綠": 50,
+    "蜂蜜檸檬": 45,
+    "水蜜桃青茶": 50,
+    "芒果綠茶": 55,
+    "鳳梨青茶": 50,
+    "梅子綠茶": 45,
+    "草莓果茶": 55,
+    "黑糖鮮奶": 60,
+    "焦糖奶茶": 55,
+    "芋頭鮮奶": 65,
+    "珍珠奶茶": 50
+};
 
-// 讀取訂單資料
+const table = document.getElementById("orderTable");
+const message = document.getElementById("message");
 
-function getOrders() {
-
-    return JSON.parse(localStorage.getItem("drinkOrders") || "[]");
-
+function addCell(row, value) {
+    const cell = document.createElement("td");
+    cell.textContent = value ?? "";
+    row.appendChild(cell);
 }
 
-// 儲存訂單資料
+async function loadOrders() {
+    message.textContent = "正在載入訂單...";
 
-function saveOrders(orders) {
+    try {
+        const response = await fetch("/api/orders");
 
-    localStorage.setItem("drinkOrders", JSON.stringify(orders));
+        if (!response.ok) {
+            throw new Error("讀取訂單失敗");
+        }
 
-}
+        const orders = await response.json();
 
-// 顯示訂單
+        table.innerHTML = "";
 
-function loadOrders() {
+        let revenue = 0;
+        let pending = 0;
+        let finished = 0;
 
-    const orders = getOrders();
+        document.getElementById("totalOrders").textContent =
+            orders.length;
 
-    const list = document.getElementById("orderList");
+        orders.forEach(order => {
+            const quantity = Number(order.quantity) || 0;
+            revenue += (prices[order.drink] || 0) * quantity;
 
-    list.innerHTML = "";
+            if (order.status === "製作中") pending++;
+            if (order.status === "已完成") finished++;
 
-    if (orders.length === 0) {
+            const row = document.createElement("tr");
 
-        list.innerHTML = `
+            addCell(row, "#" + order.id);
+            addCell(row, order.customer);
+            addCell(row, order.drink);
+            addCell(row, order.sugar);
+            addCell(row, order.ice);
+            addCell(row, order.size);
+            addCell(row, order.topping);
+            addCell(row, quantity);
+            addCell(row, order.note);
 
-            <tr>
+            const statusCell = document.createElement("td");
+            const select = document.createElement("select");
 
-                <td colspan="12" class="empty">
+            ["製作中", "已完成", "已取消"].forEach(status => {
+                const option = document.createElement("option");
+                option.value = status;
+                option.textContent = status;
 
-                    目前沒有訂單
+                if (order.status === status) {
+                    option.selected = true;
+                }
 
-                </td>
+                select.appendChild(option);
+            });
 
-            </tr>
+            select.addEventListener("change", async function() {
+                await updateStatus(order.id, select.value);
+            });
 
-        `;
+            statusCell.appendChild(select);
+            row.appendChild(statusCell);
 
-    }
+            const time = order.created_at
+                ? new Date(order.created_at.replace(" ", "T"))
+                    .toLocaleString("zh-TW")
+                : "";
 
-    orders.forEach((order, index) => {
+            addCell(row, time);
 
-        const row = document.createElement("tr");
+            table.appendChild(row);
+        });
 
-        const values = [
-
-            order.id || index + 1,
-
-            order.customer,
-
-            order.drink,
-
-            order.sugar,
-
-            order.ice,
-
-            order.size,
-
-            order.topping,
-
-            order.quantity,
-
-            "$" + order.total,
-
-            order.note || "無"
-
-        ];
-
-        values.forEach(value => {
-
+        if (orders.length === 0) {
+            const row = document.createElement("tr");
             const cell = document.createElement("td");
 
-            cell.textContent = value ?? "";
+            cell.colSpan = 11;
+            cell.className = "empty";
+            cell.textContent = "目前還沒有顧客訂單";
 
             row.appendChild(cell);
+            table.appendChild(row);
+        }
 
-        });
+        document.getElementById("totalRevenue").textContent =
+            "$" + revenue;
 
-        const statusCell = document.createElement("td");
+        document.getElementById("pendingOrders").textContent =
+            pending;
 
-        const statusSelect = document.createElement("select");
+        document.getElementById("finishedOrders").textContent =
+            finished;
 
-        ["待處理", "製作中", "已完成", "已取消"].forEach(status => {
+        message.textContent = "訂單已更新";
 
-            const option = document.createElement("option");
-
-            option.value = status;
-
-            option.textContent = status;
-
-            statusSelect.appendChild(option);
-
-        });
-
-        statusSelect.value = order.status || "待處理";
-
-        statusSelect.addEventListener("change", function() {
-
-            const latestOrders = getOrders();
-
-            latestOrders[index].status = this.value;
-
-            saveOrders(latestOrders);
-
-            loadOrders();
-
-        });
-
-        statusCell.appendChild(statusSelect);
-
-        row.appendChild(statusCell);
-
-        const actionCell = document.createElement("td");
-
-        const deleteButton = document.createElement("button");
-
-        deleteButton.textContent = "刪除";
-
-        deleteButton.className = "delete";
-
-        deleteButton.addEventListener("click", function() {
-
-            if (confirm("確定要刪除這筆訂單嗎？")) {
-
-                const latestOrders = getOrders();
-
-                latestOrders.splice(index, 1);
-
-                saveOrders(latestOrders);
-
-                loadOrders();
-
-            }
-
-        });
-
-        actionCell.appendChild(deleteButton);
-
-        row.appendChild(actionCell);
-
-        list.appendChild(row);
-
-    });
-
-    // 統計訂單
-
-    const validOrders = orders.filter(
-
-        order => order.status !== "已取消"
-
-    );
-
-    const totalMoney = validOrders.reduce(
-
-        (sum, order) => sum + Number(order.total || 0), 0
-
-    );
-
-    const pending = orders.filter(
-
-        order => !order.status || order.status === "待處理"
-
-    ).length;
-
-    const finished = orders.filter(
-
-        order => order.status === "已完成"
-
-    ).length;
-
-    document.getElementById("totalOrders").textContent =
-
-        orders.length;
-
-    document.getElementById("totalMoney").textContent =
-
-        "$" + totalMoney;
-
-    document.getElementById("pendingOrders").textContent =
-
-        pending;
-
-    document.getElementById("finishedOrders").textContent =
-
-        finished;
-
+    } catch (error) {
+        message.textContent = "無法讀取訂單，請確認伺服器是否正常運作。";
+        console.error(error);
+    }
 }
 
-// 每三秒重新整理
+async function updateStatus(id, status) {
+    try {
+        const response = await fetch("/api/orders/" + id, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ status: status })
+        });
 
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "更新失敗");
+        }
+
+        message.textContent = "訂單 #" + id + " 狀態更新成功！";
+
+        await loadOrders();
+
+    } catch (error) {
+        alert("狀態更新失敗：" + error.message);
+        await loadOrders();
+    }
+}
+
+// 每 5 秒自動更新一次
 loadOrders();
-
-setInterval(loadOrders, 3000);
-
+setInterval(loadOrders, 5000);
 </script>
 
 </body>
-
 </html>
