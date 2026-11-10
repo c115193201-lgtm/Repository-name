@@ -24,17 +24,70 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+        select, button {
+            padding: 8px 15px;
+            margin: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
     </style>
 </head>
 <body>
 
     <h1>🥤 DrinkHelper 智慧手搖飲訂閱</h1>
-    <p>歡迎來到你的專屬手搖飲小幫手！</p>
+    <p>為你量身打造的專屬手搖飲推薦系統！</p>
 
+    <!-- 今日推薦區塊 -->
     <div class="card">
-        <h3>今日熱門推薦</h3>
-        <p>✨ 珍珠奶茶 (微糖微冰) - 評分 4.8 顆星</p>
+        <h3>✨ 今日熱門推薦</h3>
+        <p>珍珠奶茶 (微糖微冰) - 評分 4.8 顆星</p>
     </div>
+
+    <!-- 互動式選擇區塊 -->
+    <div class="card">
+        <h3>🔍 尋找你的今日命定手搖飲</h3>
+        <label for="sweetness">選擇甜度：</label>
+        <select id="sweetness">
+            <option value="正常糖">正常糖</option>
+            <option value="少糖">少糖</option>
+            <option value="半糖">半糖</option>
+            <option value="微糖">微糖</option>
+            <option value="無糖">無糖</option>
+        </select>
+        <br>
+        <button onclick="recommendDrink()">幫我推薦！</button>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        function recommendDrink() {
+            const sweet = document.getElementById('sweetness').value;
+            const drinks = [
+                "四季春青茶 + 珍珠",
+                "芋頭鮮奶波波",
+                "翡翠檸檬海燕窩",
+                "芝士奶蓋紅茶",
+                "鐵觀音拿鐵"
+            ];
+            // 隨機挑選一杯飲料
+            const randomDrink = drinks[Math.floor(Math.random() * drinks.length)];
+            document.getElementById('result').innerText = `🎉 推薦你喝：${sweet} 的 ${randomDrink}！`;
+        }
+    </script>
 
 </body>
 </html>
