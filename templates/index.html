@@ -80,7 +80,7 @@
 
         <!-- 互動推薦區塊 -->
         <div class="card">
-            <h3>🔍 智慧命定推薦（自訂甜度冰塊）</h3>
+            <h3>🔍 智慧命定推薦（專屬搭配）</h3>
             <div class="form-group">
                 <label for="sweetness">選擇甜度：</label>
                 <select id="sweetness">
@@ -104,7 +104,7 @@
             <button type="button" onclick="recommendDrink()">幫我推薦飲品！</button>
             
             <!-- 推薦結果顯示區 -->
-            <div id="result">點擊上方按鈕，立刻為您推薦命定手搖飲！</div>
+            <div id="result">請選擇你的糖度與冰塊，點擊按鈕查看專屬推薦！</div>
         </div>
 
         <!-- 完整豐富菜單區塊 -->
@@ -162,22 +162,27 @@
             const sweet = document.getElementById('sweetness').value;
             const ice = document.getElementById('ice').value;
             
-            // 包含多多綠在內的飲料清單
-            const drinks = [
-                "招牌多多綠",
-                "四季春青茶 + 珍珠",
-                "芋頭鮮奶波波",
-                "鐵觀音拿鐵",
-                "黑糖珍珠鮮奶",
-                "百香雙響炮"
-            ];
+            // 建立「甜度+冰塊」對應專屬飲料的清單
+            const drinkMap = {
+                "正常糖_正常冰": "黑糖珍珠鮮奶",
+                "正常糖_少冰": "經典珍珠奶茶",
+                "半糖_少冰": "招牌多多綠",
+                "半糖_正常冰": "百香雙響炮",
+                "微糖_微冰": "芋頭鮮奶波波",
+                "微糖_少冰": "鐵觀音拿鐵",
+                "無糖_去冰": "四季春青茶 + 珍珠",
+                "無糖_微冰": "高山金萱烏龍"
+            };
 
-            // 隨機挑選一個
-            const randomDrink = drinks[Math.floor(Math.random() * drinks.length)];
-            
-            // 強制將結果寫入網頁
+            // 組合使用者的選項作為 Key (例如: "半糖_少冰")
+            const key = `${sweet}_${ice}`;
+
+            // 尋找對應的飲料，如果沒有特別設定就給一個預設推薦
+            const recommended = drinkMap[key] || "特製特調茶飲";
+
+            // 將結果立刻顯示在畫面上
             const resultBox = document.getElementById('result');
-            resultBox.innerText = `🎉 推薦你喝：${sweet}、${ice} 的「${randomDrink}」！`;
+            resultBox.innerText = `🎉 針對「${sweet}、${ice}」，為您推薦專屬飲品：${recommended}！`;
         }
     </script>
 
