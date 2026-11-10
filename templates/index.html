@@ -1,739 +1,376 @@
 
-
 <!DOCTYPE html>
-
 <html lang="zh-TW">
-
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>DrinkHelper 智慧飲料店</title>
 
 <style>
-
 * {
-
     box-sizing: border-box;
-
 }
 
 body {
-
     margin: 0;
-
     font-family: Arial, "Microsoft JhengHei", sans-serif;
-
     background: #fff8f0;
-
-    color: #49372d;
-
+    color: #49382e;
 }
 
 header {
-
-    background: #8b6046;
-
+    background: #8b5e3c;
     color: white;
-
     text-align: center;
-
-    padding: 30px 15px;
-
+    padding: 28px 15px;
 }
 
 header h1 {
-
     margin: 0;
-
-    font-size: 32px;
-
+    font-size: 30px;
 }
 
 header p {
-
     margin-bottom: 0;
-
 }
 
 .container {
-
-    max-width: 950px;
-
+    max-width: 900px;
     margin: 25px auto;
-
     padding: 20px;
-
 }
 
 .section {
-
     background: white;
-
     padding: 22px;
-
     margin-bottom: 22px;
-
     border-radius: 15px;
-
     box-shadow: 0 3px 12px #00000010;
-
 }
 
 h2 {
-
-    color: #8b6046;
-
+    color: #8b5e3c;
+    margin-top: 0;
 }
 
 .menu {
-
     display: grid;
-
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 12px;
-
 }
 
 .drink {
-
-    background: #fff3e6;
-
-    padding: 15px;
-
-    border-radius: 12px;
-
+    background: #fff4e8;
+    padding: 13px;
+    border-radius: 10px;
     text-align: center;
-
 }
 
-.drink h3 {
-
-    margin: 5px;
-
-}
-
-.price {
-
-    color: #b56d35;
-
-    font-weight: bold;
-
+.drink strong {
+    display: block;
+    margin-bottom: 6px;
 }
 
 label {
-
     display: block;
-
     margin-top: 15px;
-
     font-weight: bold;
-
 }
 
 input, select, textarea {
-
     width: 100%;
-
-    padding: 11px;
-
+    padding: 12px;
     margin-top: 7px;
-
-    border: 1px solid #ddd;
-
+    border: 1px solid #d8c5b5;
     border-radius: 8px;
-
-    font-size: 15px;
-
+    font-size: 16px;
 }
 
-button {
-
-    width: 100%;
-
-    padding: 14px;
-
-    margin-top: 20px;
-
-    border: none;
-
-    border-radius: 10px;
-
-    background: #8b6046;
-
-    color: white;
-
-    font-size: 17px;
-
-    cursor: pointer;
-
-}
-
-button:hover {
-
-    background: #68452f;
-
+textarea {
+    resize: vertical;
 }
 
 .recommend {
-
     background: #fff0d9;
-
-    padding: 18px;
-
-    margin-top: 18px;
-
-    border-radius: 10px;
-
-    text-align: center;
-
-    font-size: 19px;
-
-    font-weight: bold;
-
+    border-left: 5px solid #d69b54;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 8px;
+    line-height: 1.8;
 }
 
-#result {
-
-    display: none;
-
-    background: #e8f5e9;
-
-    padding: 18px;
-
-    margin-top: 20px;
-
+button {
+    width: 100%;
+    background: #8b5e3c;
+    color: white;
+    border: none;
+    padding: 15px;
     border-radius: 10px;
+    font-size: 18px;
+    margin-top: 22px;
+    cursor: pointer;
+}
 
+button:hover {
+    background: #70482e;
+}
+
+button:disabled {
+    background: #aaa;
+    cursor: not-allowed;
 }
 
 footer {
-
     text-align: center;
-
-    padding: 20px;
-
-    background: #8b6046;
-
-    color: white;
-
+    padding: 25px;
+    color: #927a68;
 }
-
 </style>
-
 </head>
 
 <body>
 
 <header>
-
-    <h1>🥤 DrinkHelper 智慧飲料店</h1>
-
-    <p>找到最適合你的專屬飲料！</p>
-
+    <h1>🥤 DrinkHelper</h1>
+    <p>智慧飲料推薦・輕鬆點餐</p>
 </header>
 
 <div class="container">
 
-<section class="section">
+    <div class="section">
+        <h2>🥤 飲料菜單</h2>
 
-    <h2>🍹 飲料菜單</h2>
-
-    <div class="menu" id="menu"></div>
-
-</section>
-
-<section class="section">
-
-    <h2>✨ 智慧飲料推薦</h2>
-
-    <p>選擇你的甜度與冰量，系統會自動推薦專屬飲料。</p>
-
-    <label>甜度</label>
-
-    <select id="sugar">
-
-        <option value="無糖">無糖</option>
-
-        <option value="微糖">微糖</option>
-
-        <option value="少糖">少糖</option>
-
-        <option value="半糖">半糖</option>
-
-        <option value="全糖">全糖</option>
-
-    </select>
-
-    <label>冰量</label>
-
-    <select id="ice">
-
-        <option value="去冰">去冰</option>
-
-        <option value="微冰">微冰</option>
-
-        <option value="少冰">少冰</option>
-
-        <option value="正常冰">正常冰</option>
-
-    </select>
-
-    <div class="recommend" id="recommend">
-
-        推薦飲料：去冰青檸烏龍
-
+        <div class="menu">
+            <div class="drink"><strong>青檸烏龍</strong>$45</div>
+            <div class="drink"><strong>桂花青茶</strong>$35</div>
+            <div class="drink"><strong>四季春茶</strong>$30</div>
+            <div class="drink"><strong>冷泡金萱</strong>$40</div>
+            <div class="drink"><strong>鮮橙綠茶</strong>$55</div>
+            <div class="drink"><strong>多多綠</strong>$50</div>
+            <div class="drink"><strong>葡萄柚綠</strong>$55</div>
+            <div class="drink"><strong>荔枝烏龍</strong>$50</div>
+            <div class="drink"><strong>金桔檸檬</strong>$45</div>
+            <div class="drink"><strong>百香果綠</strong>$50</div>
+            <div class="drink"><strong>蜂蜜檸檬</strong>$45</div>
+            <div class="drink"><strong>水蜜桃青茶</strong>$50</div>
+            <div class="drink"><strong>芒果綠茶</strong>$55</div>
+            <div class="drink"><strong>鳳梨青茶</strong>$50</div>
+            <div class="drink"><strong>梅子綠茶</strong>$45</div>
+            <div class="drink"><strong>草莓果茶</strong>$55</div>
+            <div class="drink"><strong>黑糖鮮奶</strong>$60</div>
+            <div class="drink"><strong>焦糖奶茶</strong>$55</div>
+            <div class="drink"><strong>芋頭鮮奶</strong>$65</div>
+            <div class="drink"><strong>珍珠奶茶</strong>$50</div>
+        </div>
     </div>
 
-</section>
+    <div class="section">
+        <h2>✨ 糖冰智慧推薦</h2>
 
-<section class="section">
-
-    <h2>🛒 線上點餐</h2>
-
-    <form id="orderForm">
-
-        <label>顧客姓名</label>
-
-        <input type="text" id="customer" placeholder="請輸入姓名" required>
-
-        <label>選擇飲料</label>
-
-        <select id="drink" required></select>
-
-        <label>甜度</label>
-
-        <select id="orderSugar">
-
-            <option>無糖</option>
-
-            <option>微糖</option>
-
-            <option>少糖</option>
-
-            <option>半糖</option>
-
-            <option>全糖</option>
-
+        <label>選擇甜度</label>
+        <select id="orderSugar" name="orderSugar">
+            <option value="無糖">無糖</option>
+            <option value="微糖">微糖</option>
+            <option value="少糖">少糖</option>
+            <option value="半糖">半糖</option>
+            <option value="全糖">全糖</option>
         </select>
 
-        <label>冰量</label>
-
-        <select id="orderIce">
-
-            <option>去冰</option>
-
-            <option>微冰</option>
-
-            <option>少冰</option>
-
-            <option>正常冰</option>
-
+        <label>選擇冰量</label>
+        <select id="orderIce" name="orderIce">
+            <option value="去冰">去冰</option>
+            <option value="微冰">微冰</option>
+            <option value="少冰">少冰</option>
+            <option value="正常冰">正常冰</option>
         </select>
 
-        <label>容量</label>
+        <div class="recommend" id="recommendBox">
+            推薦飲料：青檸烏龍
+        </div>
 
-        <select id="size">
+        <button type="button" id="useRecommend">
+            使用智慧推薦飲料
+        </button>
+    </div>
 
-            <option value="中杯">中杯</option>
+    <div class="section">
+        <h2>📝 顧客點餐</h2>
 
-            <option value="大杯">大杯 (+10元)</option>
+        <form id="orderForm">
 
-        </select>
+            <label>顧客姓名</label>
+            <input type="text" name="customer"
+                   placeholder="請輸入姓名" required>
 
-        <label>配料</label>
+            <label>選擇飲料</label>
+            <select name="drink" id="drink" required>
+                <option value="">請選擇飲料</option>
+                <option>青檸烏龍</option>
+                <option>桂花青茶</option>
+                <option>四季春茶</option>
+                <option>冷泡金萱</option>
+                <option>鮮橙綠茶</option>
+                <option>多多綠</option>
+                <option>葡萄柚綠</option>
+                <option>荔枝烏龍</option>
+                <option>金桔檸檬</option>
+                <option>百香果綠</option>
+                <option>蜂蜜檸檬</option>
+                <option>水蜜桃青茶</option>
+                <option>芒果綠茶</option>
+                <option>鳳梨青茶</option>
+                <option>梅子綠茶</option>
+                <option>草莓果茶</option>
+                <option>黑糖鮮奶</option>
+                <option>焦糖奶茶</option>
+                <option>芋頭鮮奶</option>
+                <option>珍珠奶茶</option>
+            </select>
 
-        <select id="topping">
+            <label>杯型</label>
+            <select name="size">
+                <option value="中杯">中杯</option>
+                <option value="大杯">大杯</option>
+            </select>
 
-            <option value="不加料">不加料</option>
+            <label>配料</label>
+            <select name="topping">
+                <option value="無">無</option>
+                <option value="珍珠">珍珠</option>
+                <option value="椰果">椰果</option>
+                <option value="仙草">仙草</option>
+                <option value="布丁">布丁</option>
+                <option value="芋圓">芋圓</option>
+            </select>
 
-            <option value="珍珠">珍珠 (+10元)</option>
+            <label>數量</label>
+            <input type="number" name="quantity"
+                   value="1" min="1" max="20" required>
 
-            <option value="椰果">椰果 (+10元)</option>
+            <label>備註</label>
+            <textarea name="note" rows="3"
+                      placeholder="例如：不要吸管、少一點茶味"></textarea>
 
-            <option value="布丁">布丁 (+15元)</option>
+            <button type="submit" id="submitBtn">
+                確認送出訂單
+            </button>
 
-            <option value="仙草">仙草 (+10元)</option>
-
-            <option value="寒天">寒天 (+15元)</option>
-
-        </select>
-
-        <label>數量</label>
-
-        <input type="number" id="quantity" min="1" value="1" required>
-
-        <label>備註</label>
-
-        <textarea id="note" placeholder="例如：不要吸管"></textarea>
-
-        <button type="submit">確認送出訂單</button>
-
-    </form>
-
-    <div id="result"></div>
-
-</section>
-
-<section class="section">
-
-    <h2>📋 訂單紀錄</h2>
-
-    <div id="orders">目前尚無訂單。</div>
-
-</section>
+        </form>
+    </div>
 
 </div>
 
 <footer>
-
     DrinkHelper 智慧飲料店 © 2026
-
 </footer>
 
 <script>
-
-// 飲料菜單
-
-const drinks = [
-
-    ["青檸烏龍",45],
-
-    ["桂花青茶",35],
-
-    ["四季春茶",30],
-
-    ["冷泡金萱",40],
-
-    ["鮮橙綠茶",55],
-
-    ["多多綠",50],
-
-    ["葡萄柚綠",55],
-
-    ["荔枝烏龍",50],
-
-    ["金桔檸檬",45],
-
-    ["百香果綠",50],
-
-    ["蜂蜜檸檬",45],
-
-    ["水蜜桃青茶",50],
-
-    ["芒果綠茶",55],
-
-    ["鳳梨青茶",50],
-
-    ["梅子綠茶",45],
-
-    ["草莓果茶",55],
-
-    ["黑糖鮮奶",60],
-
-    ["焦糖奶茶",55],
-
-    ["芋頭鮮奶",65],
-
-    ["珍珠奶茶",50]
-
-];
-
-// 甜度與冰量推薦表
-
 const recommendations = {
-
     "無糖": {
-
-        "去冰":"青檸烏龍",
-
-        "微冰":"桂花青茶",
-
-        "少冰":"四季春茶",
-
-        "正常冰":"冷泡金萱"
-
+        "去冰": "青檸烏龍",
+        "微冰": "桂花青茶",
+        "少冰": "四季春茶",
+        "正常冰": "冷泡金萱"
     },
-
     "微糖": {
-
-        "去冰":"鮮橙綠茶",
-
-        "微冰":"多多綠",
-
-        "少冰":"葡萄柚綠",
-
-        "正常冰":"荔枝烏龍"
-
+        "去冰": "鮮橙綠茶",
+        "微冰": "多多綠",
+        "少冰": "葡萄柚綠",
+        "正常冰": "荔枝烏龍"
     },
-
     "少糖": {
-
-        "去冰":"金桔檸檬",
-
-        "微冰":"百香果綠",
-
-        "少冰":"蜂蜜檸檬",
-
-        "正常冰":"水蜜桃青茶"
-
+        "去冰": "金桔檸檬",
+        "微冰": "百香果綠",
+        "少冰": "蜂蜜檸檬",
+        "正常冰": "水蜜桃青茶"
     },
-
     "半糖": {
-
-        "去冰":"芒果綠茶",
-
-        "微冰":"鳳梨青茶",
-
-        "少冰":"梅子綠茶",
-
-        "正常冰":"草莓果茶"
-
+        "去冰": "芒果綠茶",
+        "微冰": "鳳梨青茶",
+        "少冰": "梅子綠茶",
+        "正常冰": "草莓果茶"
     },
-
     "全糖": {
-
-        "去冰":"黑糖鮮奶",
-
-        "微冰":"焦糖奶茶",
-
-        "少冰":"芋頭鮮奶",
-
-        "正常冰":"珍珠奶茶"
-
+        "去冰": "黑糖鮮奶",
+        "微冰": "焦糖奶茶",
+        "少冰": "芋頭鮮奶",
+        "正常冰": "珍珠奶茶"
     }
-
 };
 
-// 顯示菜單
-
-const menu = document.getElementById("menu");
-
-const drinkSelect = document.getElementById("drink");
-
-drinks.forEach(item => {
-
-    menu.innerHTML += `
-
-        <div class="drink">
-
-            <h3>${item[0]}</h3>
-
-            <p class="price">$${item[1]}</p>
-
-        </div>
-
-    `;
-
-    drinkSelect.innerHTML += `
-
-        <option value="${item[0]}">${item[0]} $${item[1]}</option>
-
-    `;
-
-});
-
-// 更新推薦
+const sugar = document.getElementById("orderSugar");
+const ice = document.getElementById("orderIce");
+const recommendBox = document.getElementById("recommendBox");
+const drink = document.getElementById("drink");
 
 function updateRecommendation() {
+    const result = recommendations[sugar.value][ice.value];
 
-    const sugar = document.getElementById("sugar").value;
-
-    const ice = document.getElementById("ice").value;
-
-    const drink = recommendations[sugar][ice];
-
-    document.getElementById("recommend").innerText =
-
-        "✨ 為你推薦：" + drink;
-
-    drinkSelect.value = drink;
-
-    document.getElementById("orderSugar").value = sugar;
-
-    document.getElementById("orderIce").value = ice;
-
+    recommendBox.innerHTML =
+        "依照你的甜度與冰量，推薦飲料是：<strong>" +
+        result + "</strong>";
 }
 
-document.getElementById("sugar").addEventListener("change", updateRecommendation);
-
-document.getElementById("ice").addEventListener("change", updateRecommendation);
-
-// 點餐時同步甜度冰量
-
-document.getElementById("orderSugar").addEventListener("change", function() {
-
-    document.getElementById("sugar").value = this.value;
-
-    updateRecommendation();
-
-});
-
-document.getElementById("orderIce").addEventListener("change", function() {
-
-    document.getElementById("ice").value = this.value;
-
-    updateRecommendation();
-
-});
-
-// 取得飲料價格
-
-function getPrice(name) {
-
-    const item = drinks.find(d => d[0] === name);
-
-    return item ? item[1] : 0;
-
-}
-
-// 送出訂單
-
-let orders = [];
-
-document.getElementById("orderForm").addEventListener("submit", function(e) {
-
-    e.preventDefault();
-
-    const customer = document.getElementById("customer").value;
-
-    const drink = drinkSelect.value;
-
-    const sugar = document.getElementById("orderSugar").value;
-
-    const ice = document.getElementById("orderIce").value;
-
-    const size = document.getElementById("size").value;
-
-    const topping = document.getElementById("topping").value;
-
-    const quantity = Number(document.getElementById("quantity").value);
-
-    const note = document.getElementById("note").value;
-
-    const toppingPrices = {
-
-        "不加料":0,
-
-        "珍珠":10,
-
-        "椰果":10,
-
-        "布丁":15,
-
-        "仙草":10,
-
-        "寒天":15
-
-    };
-
-    const price = getPrice(drink);
-
-    const sizePrice = size === "大杯" ? 10 : 0;
-
-    const total = (price + sizePrice + toppingPrices[topping]) * quantity;
-
-    const order = {
-
-        customer,
-
-        drink,
-
-        sugar,
-
-        ice,
-
-        size,
-
-        topping,
-
-        quantity,
-
-        note,
-
-        total
-
-    };
-
-    orders.push(order);
-
-    document.getElementById("result").style.display = "block";
-
-    document.getElementById("result").innerHTML = `
-
-        <h3>🎉 訂單送出成功！</h3>
-
-        <p>顧客：${customer}</p>
-
-        <p>飲料：${drink}</p>
-
-        <p>甜度：${sugar}</p>
-
-        <p>冰量：${ice}</p>
-
-        <p>容量：${size}</p>
-
-        <p>配料：${topping}</p>
-
-        <p>數量：${quantity}</p>
-
-        <p>備註：${note || "無"}</p>
-
-        <h3>總金額：$${total}</h3>
-
-    `;
-
-    showOrders();
-
-    this.reset();
-
-    updateRecommendation();
-
-});
-
-// 顯示訂單紀錄
-
-function showOrders() {
-
-    const area = document.getElementById("orders");
-
-    area.innerHTML = "";
-
-    orders.forEach((order,index) => {
-
-        area.innerHTML += `
-
-            <div class="drink">
-
-                <h3>訂單 ${index + 1}</h3>
-
-                <p>顧客：${order.customer}</p>
-
-                <p>飲料：${order.drink}</p>
-
-                <p>甜度：${order.sugar}｜冰量：${order.ice}</p>
-
-                <p>數量：${order.quantity}</p>
-
-                <p>金額：$${order.total}</p>
-
-            </div>
-
-        `;
-
+sugar.addEventListener("change", updateRecommendation);
+ice.addEventListener("change", updateRecommendation);
+
+document.getElementById("useRecommend")
+    .addEventListener("click", function() {
+        drink.value = recommendations[sugar.value][ice.value];
     });
-
-}
-
-// 頁面初始推薦
 
 updateRecommendation();
 
+document.getElementById("orderForm")
+    .addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const submitBtn = document.getElementById("submitBtn");
+
+        const data = {
+            customer: form.elements["customer"].value,
+            drink: form.elements["drink"].value,
+            orderSugar: sugar.value,
+            orderIce: ice.value,
+            size: form.elements["size"].value,
+            topping: form.elements["topping"].value,
+            quantity: Number(form.elements["quantity"].value),
+            note: form.elements["note"].value
+        };
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "訂單傳送中...";
+
+        try {
+            const response = await fetch("/api/orders", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "送出失敗");
+            }
+
+            alert("訂單成功！你的訂單編號是：" + result.order_id);
+            form.reset();
+            updateRecommendation();
+
+        } catch (error) {
+            alert("訂單送出失敗：" + error.message);
+            console.error(error);
+
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "確認送出訂單";
+        }
+    });
 </script>
 
 </body>
-
 </html>
