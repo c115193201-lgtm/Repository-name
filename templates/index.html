@@ -20,7 +20,7 @@
             margin-bottom: 5px;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
         .card {
@@ -57,6 +57,10 @@
             font-weight: bold;
             color: #e74c3c;
             font-size: 18px;
+            background-color: #fadbd8;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
         }
         .menu-table {
             width: 100%;
@@ -105,11 +109,12 @@
                     <option value="溫熱飲">溫熱飲</option>
                 </select>
             </div>
-            <button onclick="recommendDrink()">幫我推薦飲品！</button>
-            <p id="result"></p>
+            <button type="button" onclick="recommendDrink()">幫我推薦飲品！</button>
+            <br>
+            <div id="result">請選擇你的喜好並點擊按鈕！</div>
         </div>
 
-        <!-- 完整菜單區塊 -->
+        <!-- 完整豐富菜單區塊 -->
         <div class="card">
             <h3>📋 智慧連鎖手搖飲精選菜單</h3>
             <table class="menu-table">
@@ -126,10 +131,22 @@
                     <td>$65</td>
                 </tr>
                 <tr>
+                    <td>咀嚼系</td>
+                    <td>黑糖珍珠鮮奶</td>
+                    <td>正常糖 / 正常冰</td>
+                    <td>$60</td>
+                </tr>
+                <tr>
                     <td>清爽茶飲</td>
                     <td>四季春青茶 + 珍珠</td>
                     <td>無糖 / 去冰</td>
                     <td>$45</td>
+                </tr>
+                <tr>
+                    <td>清爽茶飲</td>
+                    <td>高山金萱烏龍</td>
+                    <td>無糖 / 微冰</td>
+                    <td>$40</td>
                 </tr>
                 <tr>
                     <td>濃郁奶茶</td>
@@ -138,10 +155,22 @@
                     <td>$55</td>
                 </tr>
                 <tr>
+                    <td>濃郁奶茶</td>
+                    <td>皇家阿薩姆奶茶</td>
+                    <td>半糖 / 少冰</td>
+                    <td>$50</td>
+                </tr>
+                <tr>
                     <td>果茶特調</td>
                     <td>翡翠檸檬海燕窩</td>
                     <td>半糖 / 正常冰</td>
                     <td>$60</td>
+                </tr>
+                <tr>
+                    <td>果茶特調</td>
+                    <td>百香雙響炮</td>
+                    <td>少糖 / 正常冰</td>
+                    <td>$65</td>
                 </tr>
             </table>
         </div>
@@ -152,16 +181,16 @@
             const sweet = document.getElementById('sweetness').value;
             const ice = document.getElementById('ice').value;
             
-            // 根據不同選擇提供多種選項池
             const options = [
                 `【清爽解渴】${sweet}、${ice} 的「四季春青茶」`,
                 `【咀嚼口感】${sweet}、${ice} 的「芋頭鮮奶波波」`,
                 `【濃郁茶香】${sweet}、${ice} 的「鐵觀音拿鐵」`,
                 `【酸甜果香】${sweet}、${ice} 的「翡翠檸檬海燕窩」`,
-                【經典不敗】${sweet}、${ice} 的「珍珠奶茶」
+                `【經典不敗】${sweet}、${ice} 的「黑糖珍珠鮮奶」`,
+                `【人氣特調】${sweet}、${ice} 的「百香雙響炮」`,
+                【溫潤茶韻】${sweet}、${ice} 的「高山金萱烏龍」
             ];
 
-            // 隨機從多種選項中挑選一個
             const selected = options[Math.floor(Math.random() * options.length)];
             document.getElementById('result').innerText = `🎉 推薦你喝：${selected}！`;
         }
