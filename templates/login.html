@@ -1,149 +1,34 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
-
+<html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>DrinkHelper 管理員登入</title>
-
-<style>
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: Arial, "Microsoft JhengHei", sans-serif;
-    background: #eef4ef;
-}
-
-.login-box {
-    background: white;
-    width: 90%;
-    max-width: 400px;
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 5px 25px #00000012;
-}
-
-h1 {
-    text-align: center;
-    color: #174c3b;
-}
-
-p {
-    color: #64746a;
-    text-align: center;
-}
-
-label {
-    display: block;
-    margin-top: 18px;
-    margin-bottom: 7px;
-    font-weight: bold;
-}
-
-input {
-    width: 100%;
-    padding: 13px;
-    border: 1px solid #ccd7ce;
-    border-radius: 8px;
-    font-size: 16px;
-}
-
-button {
-    width: 100%;
-    padding: 13px;
-    margin-top: 22px;
-    background: #176448;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #104d35;
-}
-
-.error {
-    color: #c0392b;
-    background: #fff0ef;
-    padding: 10px;
-    border-radius: 8px;
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理後台登入 - DrinkHelper</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<body class="bg-secondary d-flex align-items-center justify-content-center vh-100">
+    <div class="card shadow p-4" style="width: 400px;">
+        <h3 class="text-center mb-4">後台管理登入</h3>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
 
-<body>
-
-<div class="login-box">
-
-    <h1>DrinkHelper</h1>
-
-    <p>店家管理後台登入</p>
-
-
-    {% with messages = get_flashed_messages() %}
-
-        {% for message in messages %}
-
-            <div class="error">
-                {{ message }}
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">管理員電子信箱</label>
+                <input type="email" name="email" class="form-control" required placeholder="admin@drinkhelper.com">
             </div>
-
-        {% endfor %}
-
-    {% endwith %}
-
-
-    <form method="POST" action="/admin/login">
-
-        <input
-            type="hidden"
-            name="csrf_token"
-            value="{{ csrf_token }}"
-        >
-
-
-        <label>管理員電子信箱</label>
-
-        <input
-            type="email"
-            name="username"
-            required
-            autocomplete="username"
-            placeholder="請輸入管理員電子信箱"
-        >
-
-
-        <label>管理員密碼</label>
-
-        <input
-            type="password"
-            name="password"
-            required
-            autocomplete="current-password"
-            placeholder="請輸入密碼"
-        >
-
-
-        <button type="submit">
-            登入管理後台
-        </button>
-
-    </form>
-
-</div>
-
+            <div class="mb-3">
+                <label class="form-label">密碼</label>
+                <input type="password" name="password" class="form-control" required placeholder="請輸入密碼">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">登入</button>
+        </form>
+    </div>
 </body>
 </html>
