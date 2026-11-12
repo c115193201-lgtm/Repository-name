@@ -1,353 +1,509 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>DrinkHelper 店家管理後台</title>
 
 <style>
-* { box-sizing: border-box; }
+
+* {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
-    padding: 20px;
     font-family: Arial, "Microsoft JhengHei", sans-serif;
-    background: #fff8f0;
-    color: #49382e;
+    background: #f4f7f4;
+    color: #26352d;
 }
 
 header {
-    background: #8b5e3c;
+    background: #174c3b;
     color: white;
-    padding: 25px;
-    border-radius: 12px;
-    text-align: center;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
-.container {
-    max-width: 1100px;
+header h1 {
+    margin: 0;
+}
+
+header button {
+    background: #ffffff;
+    color: #174c3b;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+main {
+    max-width: 1200px;
     margin: 25px auto;
+    padding: 0 15px;
 }
 
-.stats {
+.cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 15px;
-    margin-bottom: 25px;
 }
 
 .card {
     background: white;
-    padding: 20px;
+    padding: 18px;
     border-radius: 12px;
-    box-shadow: 0 3px 10px #00000010;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 10px #00000008;
 }
 
-.card h3 {
-    color: #92745e;
-    margin-top: 0;
+.card h2 {
+    color: #174c3b;
 }
 
-.number {
+.stat-number {
     font-size: 28px;
     font-weight: bold;
-    color: #8b5e3c;
-}
-
-.table-box {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    overflow-x: auto;
+    color: #176448;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 850px;
+    background: white;
 }
 
-th, td {
-    padding: 13px;
-    border-bottom: 1px solid #eee0d3;
-    text-align: center;
+th,
+td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8e3;
+    text-align: left;
 }
 
 th {
-    background: #fff0df;
-    color: #70482e;
+    background: #e9f1eb;
 }
 
-select {
-    padding: 8px;
-    border: 1px solid #d8c5b5;
+select,
+input {
+    padding: 9px;
+    border: 1px solid #ccd7ce;
     border-radius: 6px;
 }
 
 button {
-    background: #8b5e3c;
-    color: white;
+    padding: 9px 13px;
     border: none;
-    padding: 9px 14px;
-    border-radius: 7px;
+    border-radius: 6px;
+    background: #176448;
+    color: white;
     cursor: pointer;
 }
 
 button:hover {
-    background: #70482e;
+    background: #104d35;
 }
 
-.status {
+.table-wrap {
+    overflow-x: auto;
+}
+
+.status-making {
+    color: #d17b00;
     font-weight: bold;
 }
 
-.empty {
-    text-align: center;
-    padding: 30px;
-    color: #999;
+.status-done {
+    color: #168044;
+    font-weight: bold;
 }
 
-#message {
-    margin: 12px 0;
-    color: #8b5e3c;
+.status-cancel {
+    color: #c0392b;
+    font-weight: bold;
 }
 
-@media (max-width: 600px) {
-    body { padding: 10px; }
-    header { padding: 18px; }
-}
 </style>
+
 </head>
 
 <body>
 
 <header>
-    <h1>🥤 DrinkHelper 店家管理後台</h1>
-    <p>智慧飲料店訂單管理系統</p>
+
+    <h1>DrinkHelper 管理後台</h1>
+
+    <form method="POST" action="/admin/logout">
+
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token }}"
+        >
+
+        <button type="submit">
+            登出
+        </button>
+
+    </form>
+
 </header>
 
-<div class="container">
 
-    <div class="stats">
-        <div class="card">
-            <h3>總訂單數</h3>
-            <div class="number" id="totalOrders">0</div>
+<main>
+
+
+<!-- 今日統計 -->
+
+<section class="cards">
+
+    <div class="card">
+
+        <h3>目前日期</h3>
+
+        <div class="stat-number">
+            {{ today }}
         </div>
 
-        <div class="card">
-            <h3>預估營業額</h3>
-            <div class="number" id="totalRevenue">$0</div>
-        </div>
-
-        <div class="card">
-            <h3>製作中</h3>
-            <div class="number" id="pendingOrders">0</div>
-        </div>
-
-        <div class="card">
-            <h3>已完成</h3>
-            <div class="number" id="finishedOrders">0</div>
-        </div>
     </div>
 
-    <div class="table-box">
-        <h2>📋 顧客訂單管理</h2>
 
-        <button onclick="loadOrders()">重新整理訂單</button>
+    <div class="card">
 
-        <p id="message">正在載入訂單...</p>
+        <h3>訂單數量</h3>
+
+        <div class="stat-number">
+            {{ orders|length }}
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>今日營業額</h3>
+
+        <div class="stat-number">
+            ${{ revenue }}
+        </div>
+
+        <small>
+            已排除取消訂單
+        </small>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>製作中訂單</h3>
+
+        <div class="stat-number">
+            {{ making }}
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- 訂單管理 -->
+
+<section class="card">
+
+    <h2>訂單管理</h2>
+
+    <form action="/admin/history" method="GET">
+
+        <label>查詢歷史訂單日期：</label>
+
+        <input
+            type="date"
+            name="date"
+            value="{{ today }}"
+            required
+        >
+
+        <button type="submit">
+            查詢
+        </button>
+
+    </form>
+
+
+    <br>
+
+
+    <div class="table-wrap">
 
         <table>
+
             <thead>
+
                 <tr>
+
                     <th>訂單編號</th>
+
                     <th>顧客姓名</th>
+
                     <th>飲料</th>
-                    <th>甜度</th>
-                    <th>冰量</th>
-                    <th>杯型</th>
-                    <th>配料</th>
-                    <th>數量</th>
-                    <th>備註</th>
+
+                    <th>杯數</th>
+
+                    <th>金額</th>
+
                     <th>狀態</th>
+
                     <th>時間</th>
+
+                    <th>修改狀態</th>
+
                 </tr>
+
             </thead>
 
-            <tbody id="orderTable">
+
+            <tbody>
+
+                {% for order in orders %}
+
                 <tr>
-                    <td colspan="11" class="empty">目前沒有訂單</td>
+
+                    <td>
+                        {{ order.order_no }}
+                    </td>
+
+
+                    <td>
+                        {{ order.customer_name }}
+                    </td>
+
+
+                    <td>
+
+                        {{ order.drink }}
+
+                        <br>
+
+                        <small>
+                            {{ order.sugar }}
+                            /
+                            {{ order.ice }}
+                            /
+                            {{ order.size }}
+                            /
+                            {{ order.topping }}
+                        </small>
+
+                    </td>
+
+
+                    <td>
+                        {{ order.quantity }}
+                    </td>
+
+
+                    <td>
+                        ${{ order.total }}
+                    </td>
+
+
+                    <td>
+
+                        {% if order.status == "製作中" %}
+
+                            <span class="status-making">
+                                製作中
+                            </span>
+
+                        {% elif order.status == "已完成" %}
+
+                            <span class="status-done">
+                                已完成
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-cancel">
+                                已取消
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+                        {{ order.created_at.strftime("%H:%M:%S") }}
+                    </td>
+
+
+                    <td>
+
+                        <form
+                            method="POST"
+                            action="/admin/status/{{ order.order_no }}"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="csrf_token"
+                                value="{{ csrf_token }}"
+                            >
+
+
+                            <select name="status">
+
+                                <option
+                                    value="製作中"
+                                    {% if order.status == "製作中" %}
+                                    selected
+                                    {% endif %}
+                                >
+                                    製作中
+                                </option>
+
+
+                                <option
+                                    value="已完成"
+                                    {% if order.status == "已完成" %}
+                                    selected
+                                    {% endif %}
+                                >
+                                    已完成
+                                </option>
+
+
+                                <option
+                                    value="已取消"
+                                    {% if order.status == "已取消" %}
+                                    selected
+                                    {% endif %}
+                                >
+                                    已取消
+                                </option>
+
+                            </select>
+
+
+                            <button type="submit">
+                                更新
+                            </button>
+
+                        </form>
+
+                    </td>
+
                 </tr>
+
+                {% else %}
+
+                <tr>
+
+                    <td colspan="8">
+                        目前沒有訂單。
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
             </tbody>
+
         </table>
+
     </div>
 
-</div>
+</section>
+
+
+<!-- 每日報表 -->
+
+<section class="card">
+
+    <h2>每日營業報表</h2>
+
+    <div class="table-wrap">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>日期</th>
+
+                    <th>訂單數量</th>
+
+                    <th>營業額</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for report in reports %}
+
+                <tr>
+
+                    <td>
+                        {{ report.day_key }}
+                    </td>
+
+                    <td>
+                        {{ report.order_count }}
+                    </td>
+
+                    <td>
+                        ${{ report.revenue }}
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+
+                    <td colspan="3">
+                        目前沒有歷史報表。
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+</main>
+
 
 <script>
-const prices = {
-    "青檸烏龍": 45,
-    "桂花青茶": 35,
-    "四季春茶": 30,
-    "冷泡金萱": 40,
-    "鮮橙綠茶": 55,
-    "多多綠": 50,
-    "葡萄柚綠": 55,
-    "荔枝烏龍": 50,
-    "金桔檸檬": 45,
-    "百香果綠": 50,
-    "蜂蜜檸檬": 45,
-    "水蜜桃青茶": 50,
-    "芒果綠茶": 55,
-    "鳳梨青茶": 50,
-    "梅子綠茶": 45,
-    "草莓果茶": 55,
-    "黑糖鮮奶": 60,
-    "焦糖奶茶": 55,
-    "芋頭鮮奶": 65,
-    "珍珠奶茶": 50
-};
 
-const table = document.getElementById("orderTable");
-const message = document.getElementById("message");
+// 管理後台每五秒更新一次
 
-function addCell(row, value) {
-    const cell = document.createElement("td");
-    cell.textContent = value ?? "";
-    row.appendChild(cell);
-}
+setInterval(function () {
 
-async function loadOrders() {
-    message.textContent = "正在載入訂單...";
+    location.reload();
 
-    try {
-        const response = await fetch("/api/orders");
+}, 5000);
 
-        if (!response.ok) {
-            throw new Error("讀取訂單失敗");
-        }
-
-        const orders = await response.json();
-
-        table.innerHTML = "";
-
-        let revenue = 0;
-        let pending = 0;
-        let finished = 0;
-
-        document.getElementById("totalOrders").textContent =
-            orders.length;
-
-        orders.forEach(order => {
-            const quantity = Number(order.quantity) || 0;
-            revenue += (prices[order.drink] || 0) * quantity;
-
-            if (order.status === "製作中") pending++;
-            if (order.status === "已完成") finished++;
-
-            const row = document.createElement("tr");
-
-            addCell(row, "#" + order.id);
-            addCell(row, order.customer);
-            addCell(row, order.drink);
-            addCell(row, order.sugar);
-            addCell(row, order.ice);
-            addCell(row, order.size);
-            addCell(row, order.topping);
-            addCell(row, quantity);
-            addCell(row, order.note);
-
-            const statusCell = document.createElement("td");
-            const select = document.createElement("select");
-
-            ["製作中", "已完成", "已取消"].forEach(status => {
-                const option = document.createElement("option");
-                option.value = status;
-                option.textContent = status;
-
-                if (order.status === status) {
-                    option.selected = true;
-                }
-
-                select.appendChild(option);
-            });
-
-            select.addEventListener("change", async function() {
-                await updateStatus(order.id, select.value);
-            });
-
-            statusCell.appendChild(select);
-            row.appendChild(statusCell);
-
-            const time = order.created_at
-                ? new Date(order.created_at.replace(" ", "T"))
-                    .toLocaleString("zh-TW")
-                : "";
-
-            addCell(row, time);
-
-            table.appendChild(row);
-        });
-
-        if (orders.length === 0) {
-            const row = document.createElement("tr");
-            const cell = document.createElement("td");
-
-            cell.colSpan = 11;
-            cell.className = "empty";
-            cell.textContent = "目前還沒有顧客訂單";
-
-            row.appendChild(cell);
-            table.appendChild(row);
-        }
-
-        document.getElementById("totalRevenue").textContent =
-            "$" + revenue;
-
-        document.getElementById("pendingOrders").textContent =
-            pending;
-
-        document.getElementById("finishedOrders").textContent =
-            finished;
-
-        message.textContent = "訂單已更新";
-
-    } catch (error) {
-        message.textContent = "無法讀取訂單，請確認伺服器是否正常運作。";
-        console.error(error);
-    }
-}
-
-async function updateStatus(id, status) {
-    try {
-        const response = await fetch("/api/orders/" + id, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ status: status })
-        });
-
-        const result = await response.json();
-
-        if (!response.ok || !result.success) {
-            throw new Error(result.message || "更新失敗");
-        }
-
-        message.textContent = "訂單 #" + id + " 狀態更新成功！";
-
-        await loadOrders();
-
-    } catch (error) {
-        alert("狀態更新失敗：" + error.message);
-        await loadOrders();
-    }
-}
-
-// 每 5 秒自動更新一次
-loadOrders();
-setInterval(loadOrders, 5000);
 </script>
 
 </body>
