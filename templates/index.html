@@ -1,525 +1,85 @@
-
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="csrf-token" content="{{ csrf_token }}">
-<title>DrinkHelper 智慧飲料店</title>
-
-<style>
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: Arial, "Microsoft JhengHei", sans-serif;
-    background: #f4f8f5;
-    color: #263b30;
-}
-
-header {
-    background: #174c3b;
-    color: white;
-    text-align: center;
-    padding: 28px 15px;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 30px;
-}
-
-main {
-    max-width: 950px;
-    margin: 20px auto;
-    padding: 0 14px;
-}
-
-.panel {
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 18px;
-    box-shadow: 0 3px 12px #0000000c;
-}
-
-h2 {
-    color: #174c3b;
-}
-
-.notice {
-    background: #fff1d9;
-    color: #805000;
-    padding: 15px;
-    border-radius: 10px;
-    font-weight: bold;
-    margin-bottom: 18px;
-}
-
-button, input, select {
-    font: inherit;
-    border-radius: 9px;
-}
-
-button {
-    border: none;
-    background: #176448;
-    color: white;
-    padding: 12px 16px;
-    cursor: pointer;
-    font-weight: bold;
-    margin: 5px 3px;
-}
-
-button:active {
-    transform: scale(.97);
-}
-
-button:disabled {
-    opacity: .5;
-    cursor: not-allowed;
-}
-
-.secondary {
-    background: #e5efe8;
-    color: #174c3b;
-}
-
-.choice-area {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 12px 0;
-}
-
-.choice-area button {
-    flex: 1 1 130px;
-    min-height: 48px;
-}
-
-.choice-area button.selected {
-    background: #e0a74a;
-    color: #263b30;
-}
-
-#recommendPanel {
-    display: none;
-}
-
-.chat {
-    background: #f3f8f4;
-    border-radius: 12px;
-    padding: 12px;
-    min-height: 100px;
-    max-height: 300px;
-    overflow-y: auto;
-    margin: 15px 0;
-}
-
-.msg {
-    padding: 10px 13px;
-    border-radius: 10px;
-    margin: 8px 0;
-    max-width: 90%;
-    white-space: pre-wrap;
-}
-
-.bot {
-    background: #dfeee4;
-}
-
-.me {
-    background: #dceafa;
-    margin-left: auto;
-}
-
-.result {
-    background: #fff5df;
-    padding: 15px;
-    border-radius: 10px;
-    margin-top: 12px;
-    font-weight: bold;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    gap: 12px;
-}
-
-label {
-    display: block;
-    font-weight: bold;
-    margin: 10px 0 5px;
-}
-
-input, select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccd8cf;
-    background: white;
-}
-
-.drinks {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
-    gap: 10px;
-}
-
-.drink {
-    background: #f0f6f1;
-    padding: 13px;
-    border-radius: 9px;
-}
-
-.full {
-    width: 100%;
-    margin: 10px 0;
-}
-
-#summary {
-    margin-top: 15px;
-    line-height: 1.8;
-}
-
-.small {
-    color: #68776d;
-    font-size: 13px;
-}
-
-@media(max-width:480px) {
-    header h1 {
-        font-size: 25px;
-    }
-
-    .panel {
-        padding: 15px;
-    }
-
-    .choice-area button {
-        flex: 1 1 42%;
-    }
-}
-</style>
-</head>
-
-<body>
-
-<header>
-    <h1>DrinkHelper 🧋</h1>
-    <p>找到今天最想喝的那一杯</p>
-</header>
-
-<main>
-
-<div class="notice">
-    每筆線上訂單最多 35 杯，超過 35 杯請電話訂購：0900-878787
-</div>
-
-<!-- 專屬推薦 -->
-
-<section class="panel">
-    <h2>AI 智慧飲料推薦</h2>
-
-    <p>讓 DrinkHelper 根據你的心情、甜度與冰塊，推薦專屬飲料。</p>
-
-    <button class="full" id="openRecommend">
-        ✨ 專屬推薦
-    </button>
-
-    <div id="recommendPanel">
-
-        <div class="chat" id="chat">
-            <div class="msg bot">
-                嗨！歡迎使用 DrinkHelper！
-                請先選擇今天想要的感受。
-            </div>
-        </div>
-
-        <h3 id="stepTitle">① 選擇今天的感受</h3>
-
-        <div class="choice-area" id="moodChoices">
-
-            <button data-mood="清爽解渴">💧 清爽解渴</button>
-            <button data-mood="酸甜開胃">🍋 酸甜開胃</button>
-            <button data-mood="茶香回甘">🍵 茶香回甘</button>
-            <button data-mood="濃郁香醇">🥛 濃郁香醇</button>
-            <button data-mood="水果清新">🍓 水果清新</button>
-            <button data-mood="咀嚼口感">🧋 咀嚼口感</button>
-            <button data-mood="想喝點甜的">🍯 想喝點甜的</button>
-
-        </div>
-
-        <h3>② 選擇甜度</h3>
-        <div class="choice-area" id="sugarChoices"></div>
-
-        <h3>③ 選擇冰塊</h3>
-        <div class="choice-area" id="iceChoices"></div>
-
-        <div id="recommendation" class="result" hidden></div>
-
-        <button class="secondary full" id="resetRecommend">
-            重新選擇
-        </button>
-
-    </div>
-</section>
-
-<!-- 菜單 -->
-
-<section class="panel">
-    <h2>完整飲料菜單</h2>
-
-    <div class="drinks">
-        {% for name, price in menu.items() %}
-        <div class="drink">
-            {{ name }}
-            <br>
-            <b>$ {{ price }}</b>
-        </div>
-        {% endfor %}
-    </div>
-</section>
-
-<!-- 訂單 -->
-
-<section class="panel">
-    <h2>建立訂單</h2>
-
-    <form id="orderForm">
-
-        <div class="grid">
-
-            <div>
-                <label>顧客姓名（必填）</label>
-                <input id="name" maxlength="30"
-                placeholder="請輸入中英文姓名" required>
-            </div>
-
-            <div>
-                <label>飲料</label>
-                <select id="drink">
-                    {% for name, price in menu.items() %}
-                    <option value="{{ name }}">
-                        {{ name }} ${{ price }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div>
-                <label>甜度</label>
-                <select id="sugar">
-                    {% for s in sugars %}
-                    <option>{{ s }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div>
-                <label>冰塊</label>
-                <select id="ice">
-                    {% for i in ices %}
-                    <option>{{ i }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div>
-                <label>杯數（1～35）</label>
-                <select id="quantity">
-                    {% for n in range(1,36) %}
-                    <option>{{ n }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div>
-                <label>尺寸</label>
-                <select id="size">
-                    <option>中杯</option>
-                    <option>大杯</option>
-                </select>
-            </div>
-
-            <div>
-                <label>配料</label>
-                <select id="topping">
-                    <option>無</option>
-                    <option>珍珠</option>
-                    <option>椰果</option>
-                    <option>仙草</option>
-                </select>
-            </div>
-
-            <div>
-                <label>備註（選填）</label>
-                <input id="note" maxlength="200"
-                placeholder="例如：不要吸管">
-            </div>
-
-        </div>
-
-        <button type="button" class="full" id="previewOrder">
-            確認資料並預覽訂單
-        </button>
-
-    </form>
-
-    <div id="summary"></div>
-</section>
-
-<!-- 訂單查詢 -->
-
-<section class="panel">
-    <h2>查詢訂單進度</h2>
-
-    <label>訂單編號</label>
-    <input id="trackNo" placeholder="輸入訂單編號">
-
-    <label>訂單查詢碼</label>
-    <input id="trackToken" placeholder="輸入訂單查詢碼">
-
-    <button class="full" id="checkStatus">
-        查詢訂單
-    </button>
-
-    <p id="statusText"></p>
-</section>
-
-</main>
-
-<script>
-const csrfToken =
-document.querySelector('meta[name="csrf-token"]').content;
-
-const headers = {
-    "Content-Type": "application/json",
-    "X-CSRFToken": csrfToken
-};
-
-const state = {
-    mood: null,
-    sugar: null,
-    ice: null,
-    recommendation: null
-};
-
-const prices = {{ menu | tojson }};
-
-const chat = document.getElementById("chat");
-
-const moodChoices = document.getElementById("moodChoices");
-const sugarChoices = document.getElementById("sugarChoices");
-const iceChoices = document.getElementById("iceChoices");
-
-const recommendation =
-document.getElementById("recommendation");
-
-let busy = false;
-let pollTimer = null;
-let lastStatus = null;
-
-function addMsg(message, type) {
-    const div = document.createElement("div");
-    div.className = "msg " + type;
-    div.textContent = message;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-}
-
-async function sendMessage(message) {
-
-    if (busy) return null;
-
-    busy = true;
-
-    try {
-
-        const response = await fetch("/api/ai-chat", {
-            method: "POST",
-            headers: headers,
-            body: JSON.stringify({
-                message: message,
-                mood: state.mood,
-                sugar: state.sugar,
-                ice: state.ice
-            })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.reply || data.error || "推薦服務暫時無法使用");
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrinkHelper 智慧飲料店</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #fdfbf7;
+            color: #4a3b32;
+            font-family: "Microsoft JhengHei", sans-serif;
         }
+        .header-bg {
+            background-color: #8c6d53;
+            color: white;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+        .drink-card {
+            background-color: #fcf4ec;
+            border: 1px solid #f2e3d5;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .drink-card:hover {
+            background-color: #f2e1cf;
+            transform: translateY(-2px);
+        }
+        .card {
+            border: none;
+            border-radius: 16px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 15px rgba(140, 109, 83, 0.08);
+        }
+        .btn-primary {
+            background-color: #8c6d53;
+            border-color: #8c6d53;
+        }
+        .btn-primary:hover {
+            background-color: #735741;
+            border-color: #735741;
+        }
+        .btn-success {
+            background-color: #6b8c63;
+            border-color: #6b8c63;
+        }
+        .btn-success:hover {
+            background-color: #587552;
+            border-color: #587552;
+        }
+        .feel-btn {
+            margin: 3px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .feel-btn.active {
+            background-color: #8c6d53 !important;
+            color: white !important;
+            border-color: #8c6d53 !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- 頁面頂端醒目警示 -->
+    <div class="alert alert-danger text-center m-0 rounded-0 fw-bold fs-6 shadow-sm">
+        每筆線上訂單最多35杯，超過35杯請電話訂購，電話專線：0900-878787
+    </div>
 
-        return data;
+    <!-- 頂部標題區塊 -->
+    <div class="header-bg text-center py-4 px-3 mb-4 shadow-sm">
+        <h2 class="fw-bold mb-1">🥤 DrinkHelper 智慧飲料店</h2>
+        <p class="mb-0 text-light opacity-75">找到最適合你的專屬飲料！</p>
+    </div>
 
-    } catch (error) {
-
-        addMsg(error.message, "bot");
-        return null;
-
-    } finally {
-        busy = false;
-    }
-}
-
-// 開啟專屬推薦
-
-document.getElementById("openRecommend")
-.addEventListener("click", () => {
-
-    document.getElementById("recommendPanel").style.display = "block";
-
-    document.getElementById("recommendPanel")
-    .scrollIntoView({ behavior: "smooth", block: "start" });
-
-});
-
-// 選擇感受
-
-moodChoices.addEventListener("click", async (event) => {
-
-    const button = event.target.closest("[data-mood]");
-
-    if (!button || busy) return;
-
-    state.mood = button.dataset.mood;
-    state.sugar = null;
-    state.ice = null;
-    state.recommendation = null;
-
-    moodChoices.querySelectorAll("button")
-    .forEach(b => b.classList.remove("selected"));
-
-    button.classList.add("selected");
-
-    sugarChoices.innerHTML = "";
-    iceChoices.innerHTML = "";
-    recommendation.hidden = true;
-
-    addMsg("我今天想要：" + state.mood, "me");
-
-    const data = await sendMessage(state.mood);
-
-    if (!data) return;
-
-    addMsg(data.reply, "bot");
-
-    document.getElementById("stepTitle").textContent =
-    "② 選擇你喜歡的甜度";
-
-    createChoices(
-        sugarChoices,
-        ["無糖", "微糖", "少糖", "半糖", "全糖"],
-        selectSugar
-    );
-
-});
-
-// 建立選項按鈕
-
-function createChoices(container, options,
+    <div class="container mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                
+                <!-- 飲料菜單預覽區塊 -->
+                <div class="card p-4 mb-4">
+                    <h4 class="fw-bold mb-3" style="color: #6e523b;">🧋 飲料菜單 <small class="fs-6 text-muted fw-normal">(點擊可直接帶入下方點餐)</small></h4>
+                    <div class="row g-3"
