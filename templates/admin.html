@@ -3,129 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理後台 - DrinkHelper</title>
+    <title>DrinkHelper 店家管理後台</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #fdfbf7;
+            color: #4a3b32;
+            font-family: "Microsoft JhengHei", sans-serif;
+        }
+        .header-bg {
+            background-color: #8c6d53;
+            color: white;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 16px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 15px rgba(140, 109, 83, 0.08);
+            transition: transform 0.2s;
+        }
+        .stat-card {
+            background-color: #fcf4ec;
+            border: 1px solid #f2e3d5;
+            border-radius: 14px;
+        }
+        .btn-primary {
+            background-color: #8c6d53;
+            border-color: #8c6d53;
+        }
+        .btn-primary:hover {
+            background-color: #735741;
+            border-color: #735741;
+        }
+        .table-custom th {
+            background-color: #f2e3d5;
+            color: #4a3b32;
+            border-top: none;
+        }
+    </style>
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark px-4">
-        <span class="navbar-brand mb-0 h1">DrinkHelper 後台管理系統</span>
-        <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-light btn-sm">登出</a>
-    </nav>
+<body>
+    <!-- 頂部標題區塊 -->
+    <div class="header-bg text-center py-4 px-3 mb-4 shadow-sm">
+        <h2 class="fw-bold mb-1">🏪 DrinkHelper 店家管理後台</h2>
+        <p class="mb-0 text-light opacity-75">訂單管理與營業狀況總覽</p>
+    </div>
 
-    <div class="container my-4">
-        <!-- 統計卡片 -->
-        <div class="row text-center mb-4">
-            <div class="col-md-4">
-                <div class="card bg-primary text-white p-3 shadow-sm">
-                    <h5>今日訂單數</h5>
-                    <h3>{{ today_count }}</h3>
+    <div class="container mb-5">
+        <!-- 數據統計看板 -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-3 text-center shadow-sm">
+                    <div class="text-muted fw-semibold small mb-1">📋 今日訂單</div>
+                    <div class="fs-3 fw-bold text-dark" id="stat-total-count">0</div>
+                    <div class="text-muted small mt-1">累積訂單數量</div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card bg-success text-white p-3 shadow-sm">
-                    <h5>今日營業額 (不含取消)</h5>
-                    <h3>${{ today_revenue }}</h3>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-3 text-center shadow-sm">
+                    <div class="text-muted fw-semibold small mb-1">💰 今日營業額</div>
+                    <div class="fs-3 fw-bold text-success" id="stat-total-revenue">$0</div>
+                    <div class="text-muted small mt-1">已接收訂單金額</div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card bg-warning text-dark p-3 shadow-sm">
-                    <h5>製作中數量</h5>
-                    <h3>{{ preparing_count }}</h3>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-3 text-center shadow-sm">
+                    <div class="text-muted fw-semibold small mb-1">⏳ 待處理訂單</div>
+                    <div class="fs-3 fw-bold text-warning" id="stat-pending-count">0</div>
+                    <div class="text-muted small mt-1">等待店家處理</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-3 text-center shadow-sm">
+                    <div class="text-muted fw-semibold small mb-1">✅ 已完成訂單</div>
+                    <div class="fs-3 fw-bold text-primary" id="stat-completed-count">0</div>
+                    <div class="text-muted small mt-1">完成製作的訂單</div>
                 </div>
             </div>
         </div>
 
-        <!-- 歷史日期查詢 -->
-        <div class="card p-3 mb-4 shadow-sm">
-            <form method="GET" class="row g-3 align-items-center">
-                <div class="col-auto">
-                    <label class="col-form-label fw-bold">歷史訂單日期查詢：</label>
-                </div>
-                <div class="col-auto">
-                    <input type="date" name="date" class="form-control" value="{{ date_filter }}">
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-secondary">查詢</button>
-                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">清除</a>
-                </div>
-            </form>
-        </div>
+        <!-- 顧客訂單管理區塊 -->
+        <div class="card p-4 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-0" style="color: #6e523b;">📦 顧客訂單管理</h4>
+                <button class="btn btn-primary btn-sm fw-bold" onclick="location.reload()">🔄 重新整理訂單</button>
+            </div>
 
-        <!-- 訂單列表 -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-white fw-bold">訂單管理列表 (每5秒自動更新)</div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped mb-0 align-middle text-center">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>時間</th>
-                                <th>顧客姓名</th>
-                                <th>品項</th>
-                                <th>規格</th>
-                                <th>數量</th>
-                                <th>金額</th>
-                                <th>備註</th>
-                                <th>狀態</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for order in orders %}
-                            <tr>
-                                <td>{{ order.id }}</td>
-                                <td>{{ order.created_at.strftime('%m-%d %H:%M') }}</td>
-                                <td>{{ order.customer_name }}</td>
-                                <td>{{ order.drink_name }}</td>
-                                <td>{{ order.sugar }} / {{ order.ice }} / {{ order.size }} / {{ order.topping }}</td>
-                                <td>{{ order.quantity }}</td>
-                                <td>${{ order.total_price }}</td>
-                                <td>{{ order.notes or '-' }}</td>
-                                <td>
-                                    <select class="form-select form-select-sm status-select" data-id="{{ order.id }}">
-                                        <option value="製作中" {% if order.status == '製作中' %}selected{% endif %}>製作中</option>
-                                        <option value="已完成" {% if order.status == '已完成' %}selected{% endif %}>已完成</option>
-                                        <option value="已取消" {% if order.status == '已取消' %}selected{% endif %}>已取消</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="9" class="text-center py-4 text-muted">目前沒有符合的訂單記錄</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle table-custom">
+                    <thead>
+                        <tr>
+                            <th>訂單編號</th>
+                            <th>顧客姓名</th>
+                            <th>品項內容</th>
+                            <th>杯數/金額</th>
+                            <th>甜度/冰塊</th>
+                            <th>狀態</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body">
+                        <!-- 動態載入訂單 -->
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">目前尚無訂單資料</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
     <script>
-        // 狀態修改綁定
-        document.querySelectorAll('.status-select').forEach(select => {
-            select.addEventListener('change', function() {
-                const orderId = this.dataset.id;
-                const newStatus = this.value;
-                
-                fetch(`/admin/order/${orderId}/status`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: newStatus })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (!data.success) {
-                        alert('更新狀態失敗');
-                    }
-                });
-            });
-        });
-
-        // 每 5 秒自動輪詢更新後台
-        setInterval(() => {
-            location.reload();
-        }, 5000);
+        // 這裡可依後端 API 串接實際訂單資料，目前維持預設框架與奶茶色互動
     </script>
 </body>
 </html>
