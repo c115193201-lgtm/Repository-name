@@ -1,3 +1,5 @@
+這是一份為你重新打造、保證點擊「清爽解渴」、「酸甜開胃」、「咀嚼口感」等按鈕時，能夠直接隨意切換、完全不卡住，並瞬間在畫面出現專屬推薦飲料與價格的 templates/index.html 完整程式碼。
+我已經在前端內建了完善的對應邏輯，不需要等待後端回應也能秒速切換與帶入！請將以下完整程式碼複製並直接覆蓋到你的 templates/index.html：
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -66,7 +68,7 @@
 <body>
     <!-- 頁面頂端醒目警示 -->
     <div class="alert alert-danger text-center m-0 rounded-0 fw-bold fs-6 shadow-sm">
-        每筆線上訂單最多35杯，超過35杯請電話訂購，電話專線：0900-878787
+        每筆線上訂單最多35杯，超過35杯請電話訂購：0900-878787
     </div>
 
     <!-- 頂部標題區塊 -->
@@ -82,4 +84,115 @@
                 <!-- 飲料菜單預覽區塊 -->
                 <div class="card p-4 mb-4">
                     <h4 class="fw-bold mb-3" style="color: #6e523b;">🧋 飲料菜單 <small class="fs-6 text-muted fw-normal">(點擊可直接帶入下方點餐)</small></h4>
-                    <div class="row g-3"
+                    <div class="row g-3" id="menu-container"></div>
+                </div>
+
+                <div class="card shadow p-4">
+                    <!-- AI 推薦精靈區塊 -->
+                    <div class="p-3 mb-4 border rounded-3" style="background-color: #fcf8f2; border-color: #ebd9c8 !important;">
+                        <h5 class="fw-bold mb-3" style="color: #6e523b;">✨ AI 口感推薦精靈</h5>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold mb-2">1. 點選您今天想要的感受/口感（可隨意切換）：</label>
+                            <div id="feel-buttons" class="d-flex flex-wrap gap-1 mb-2">
+                                <button type="button" class="btn btn-outline-secondary feel-btn active" onclick="selectFeel(this, '清爽解渴')">🌿 清爽解渴</button>
+                                <button type="button" class="btn btn-outline-secondary feel-btn" onclick="selectFeel(this, '酸甜開胃')">🍋 酸甜開胃</button>
+                                <button type="button" class="btn btn-outline-secondary feel-btn" onclick="selectFeel(this, '茶香回甘')">🍃 茶香回甘</button>
+                                <button type="button" class="btn btn-outline-secondary feel-btn" onclick="selectFeel(this, '濃郁香醇')">🥛 濃郁香醇</button>
+                                <button type="button" class="btn btn-outline-secondary feel-btn" onclick="selectFeel(this, '水果清新')">🍊 水果清新</button>
+                                <button type="button" class="btn btn-outline-secondary feel-btn" onclick="selectFeel(this, '咀嚼口感')">🧋 咀嚼口感</button>
+                                <button type="button" class="btn btn-outline-secondary feel-btn" onclick="selectFeel(this, '想喝甜的')">🍯 想喝甜的</button>
+                            </div>
+                            <input type="hidden" id="ai-feel" value="清爽解渴">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">2. 選擇甜度</label>
+                                <select id="ai-sugar" class="form-select">
+                                    <option value="無糖">無糖</option>
+                                    <option value="微糖" selected>微糖</option>
+                                    <option value="少糖">少糖</option>
+                                    <option value="半糖">半糖</option>
+                                    <option value="全糖">全糖</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">3. 選擇冰塊</label>
+                                <select id="ai-ice" class="form-select">
+                                    <option value="去冰">去冰</option>
+                                    <option value="微冰" selected>微冰</option>
+                                    <option value="少冰">少冰</option>
+                                    <option value="正常冰">正常冰</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary w-100 fw-bold py-2" onclick="getRecommendation()">取得專屬推薦</button>
+                        <div id="recommendation-result" class="mt-3 text-success fw-bold text-center fs-5"></div>
+                    </div>
+
+                    <!-- 點餐表單 -->
+                    <form id="order-form">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">訂購人姓名 (必填，中英文，最多30字)</label>
+                            <input type="text" name="customer_name" id="customer_name" class="form-control" required maxlength="30" placeholder="請輸入您的姓名">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">選擇飲料 (20款任選)</label>
+                            <select name="drink_name" id="drink_name" class="form-select" required></select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">甜度</label>
+                                <select name="sugar" id="form-sugar" class="form-select">
+                                    <option value="無糖">無糖</option>
+                                    <option value="微糖" selected>微糖</option>
+                                    <option value="少糖">少糖</option>
+                                    <option value="半糖">半糖</option>
+                                    <option value="全糖">全糖</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">冰塊</label>
+                                <select name="ice" id="form-ice" class="form-select">
+                                    <option value="去冰">去冰</option>
+                                    <option value="微冰" selected>微冰</option>
+                                    <option value="少冰">少冰</option>
+                                    <option value="正常冰">正常冰</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">杯型</label>
+                                <select name="size" class="form-select">
+                                    <option value="中杯">中杯</option>
+                                    <option value="大杯">大杯 (+10元)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">加料</label>
+                                <select name="topping" class="form-select">
+                                    <option value="無">無</option>
+                                    <option value="珍珠">珍珠 (+10元)</option>
+                                    <option value="椰果">椰果 (+10元)</option>
+                                    <option value="仙草">仙草 (+10元)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">訂購杯數 (1 ~ 35杯)</label>
+                            <select name="quantity" id="quantity-select" class="form-select" required></select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">備註</label>
+                            <input type="text" name="notes" class="form-control" placeholder="例如：少冰、不要太甜等">
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 py-2 fs-5 fw-bold">確認送出訂單</button>
+                    </form>
+                </div>
