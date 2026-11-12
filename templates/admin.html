@@ -22,7 +22,6 @@
             border-radius: 16px;
             background-color: #ffffff;
             box-shadow: 0 4px 15px rgba(140, 109, 83, 0.08);
-            transition: transform 0.2s;
         }
         .stat-card {
             background-color: #fcf4ec;
@@ -88,7 +87,7 @@
         <div class="card p-4 shadow-sm">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold mb-0" style="color: #6e523b;">📦 顧客訂單管理</h4>
-                <button class="btn btn-primary btn-sm fw-bold" onclick="location.reload()">🔄 重新整理訂單</button>
+                <button class="btn btn-primary btn-sm fw-bold" onclick="loadOrders()">🔄 重新整理訂單</button>
             </div>
 
             <div class="table-responsive">
@@ -97,17 +96,15 @@
                         <tr>
                             <th>訂單編號</th>
                             <th>顧客姓名</th>
-                            <th>品項內容</th>
+                            <th>品項與規格</th>
                             <th>杯數/金額</th>
-                            <th>甜度/冰塊</th>
                             <th>狀態</th>
-                            <th>操作</th>
+                            <th>操作控制</th>
                         </tr>
                     </thead>
                     <tbody id="orders-table-body">
-                        <!-- 動態載入訂單 -->
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">目前尚無訂單資料</td>
+                            <td colspan="6" class="text-center text-muted py-4">正在載入訂單資料...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -116,7 +113,80 @@
     </div>
 
     <script>
-        // 這裡可依後端 API 串接實際訂單資料，目前維持預設框架與奶茶色互動
+        function loadOrders() {
+            // 從後端 API 取得所有訂單資料
+            fetch('/api/admin/orders')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('orders-table-body');
+                    tbody.innerHTML = '';
+
+                    if (!data.orders || data.orders.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">目前尚無任何訂單</td></tr>`;
+                        updateStats([]);
+                        return;
+                    }
+
+                    let totalRevenue = 0;
+                    let pendingCount = 0;
+                    let completedCount = 0;
+
+                    data.orders.forEach(order => {
+                        totalRevenue += order.total_price;
+                        if (order.status === '待處理') pendingCount++;
+                        if (order.status === '已完成') completedCount++;
+
+                        let statusBadgeClass = 'bg-warning text-dark';
+                        if (order.status === '已完成') statusBadgeClass = 'bg-success text-white';
+                        if (order.status === '已取消') statusBadgeClass = 'bg-danger text-white';
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td><code>${order.token}</code></td>
+                                <td class="fw-bold">${order.customer_name}</td>
+                                <td>${order.drink_name}<br><small class="text-muted">${order.sugar} / ${order.ice} / ${order.size} / 加料:${order.topping}</small></td>
+                                <td>${order.quantity} 杯<br><strong class="text-success">$${order.total_price}</strong></td>
+                                <td><span class="badge ${statusBadgeClass}">${order.status}</span></td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-success" onclick="updateStatus('${order.token}', '已完成')">完成</button>
+                                        <button class="btn btn-outline-danger" onclick="updateStatus('${order.token}', '已取消')">取消</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    // 更新上方統計看板
+                    document.getElementById('stat-total-count').innerText = data.orders.length;
+                    document.getElementById('stat-total-revenue').innerText = `$${totalRevenue}`;
+                    document.getElementById('stat-pending-count').innerText = pendingCount;
+                    document.getElementById('stat-completed-count').innerText = completedCount;
+                })
+                .catch(err => {
+                    console.log('載入訂單失敗');
+                });
+        }
+
+        function updateStatus(token, newStatus) {
+            fetch(`/api/admin/update_status/${token}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    loadOrders(); // 重新整理列表
+                } else {
+                    alert('更新狀態失敗');
+                }
+            });
+        }
+
+        // 頁面載入時自動讀取，並每 5 秒自動更新後台數據
+        loadOrders();
+        setInterval(loadOrders, 5000);
     </script>
 </body>
 </html>
