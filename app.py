@@ -5,7 +5,7 @@ from flask import Flask, jsonify, redirect, render_template, request, url_for
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'drink-helper-secret-key')
 
-# 20 款預設飲料清單
+# 20 款預設飲料清單與價格
 drinks = [
     {'name': '青檸烏龍', 'price': 45},
     {'name': '桂花青茶', 'price': 35},
@@ -114,7 +114,13 @@ def order_status_api(token):
 
 @app.route('/admin')
 def admin_panel():
-  return render_template('admin.html', orders=list(orders.values()))
+  return render_template('admin.html')
+
+
+@app.route('/api/admin/orders')
+def admin_orders_api():
+  # 回傳所有訂單給管理員後台看板
+  return jsonify({'orders': list(orders.values())})
 
 
 @app.route('/api/admin/update_status/<token>', methods=['POST'])
