@@ -39,63 +39,99 @@
             border-color: #8c6d53;
         }
         .btn-primary:hover {
-            background-color: #735741;
-            border-color: #735741;
-        }
-        .btn-success {
-            background-color: #6b8c63;
-            border-color: #6b8c63;
-        }
-        .btn-success:hover {
-            background-color: #587552;
-            border-color: #587552;
-        }
-        .feel-btn {
-            margin: 3px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-        /* 被選中的口感按鈕樣式 */
-        .feel-btn.selected {
-            background-color: #8c6d53 !important;
-            color: white !important;
-            border-color: #8c6d53 !important;
-        }
-    </style>
-</head>
-<body>
-    <!-- 頁面頂端醒目警示 -->
-    <div class="alert alert-danger text-center m-0 rounded-0 fw-bold fs-6 shadow-sm">
-        每筆線上訂單最多35杯，超過35杯請電話訂購：0900-878787
-    </div>
+            background-color
+                <script>
+        const drinksData = [
+            { name: "青檸烏龍", price: 45 }, { name: "桂花青茶", price: 35 },
+            { name: "四季春茶", price: 30 }, { name: "冷泡金萱", price: 40 },
+            { name: "珍珠奶茶", price: 50 }, { name: "黑糖鮮奶", price: 65 },
+            { name: "芋頭鮮奶", price: 70 }, { name: "焦糖奶茶", price: 55 },
+            { name: "金桔檸檬", price: 50 }, { name: "百香果綠", price: 50 },
+            { name: "梅子綠茶", price: 40 }, { name: "鮮橙綠茶", price: 60 },
+            { name: "葡萄柚綠", price: 60 }, { name: "水蜜桃青茶", price: 55 },
+            { name: "芒果綠茶", price: 55 }, { name: "荔枝烏龍", price: 50 },
+            { name: "草莓果茶", price: 65 }, { name: "冬瓜檸檬", price: 45 },
+            { name: "仙草凍奶茶", price: 55 }, { name: "椰果百香綠", price: 55 }
+        ];
 
-    <!-- 頂部標題區塊 -->
-    <div class="header-bg text-center py-4 px-3 mb-4 shadow-sm">
-        <h2 class="fw-bold mb-1">🥤 DrinkHelper 智慧飲料店</h2>
-        <p class="mb-0 text-light opacity-75">找到最適合你的專屬飲料！</p>
-    </div>
+        window.onload = function() {
+            const menuContainer = document.getElementById('menu-container');
+            const drinkSelect = document.getElementById('drink_name');
+            const qtySelect = document.getElementById('quantity-select');
 
-    <div class="container mb-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                
-                <!-- 飲料菜單預覽區塊 -->
-                <div class="card p-4 mb-4">
-                    <h4 class="fw-bold mb-3" style="color: #6e523b;">🧋 飲料菜單 <small class="fs-6 text-muted fw-normal">(點擊可直接帶入下方點餐)</small></h4>
-                    <div class="row g-3" id="menu-container"></div>
-                </div>
+            drinksData.forEach(d => {
+                menuContainer.innerHTML += `
+                    <div class="col-6 col-md-4">
+                        <div class="drink-card p-3 text-center shadow-sm" onclick="pickDrink('${d.name}')">
+                            <div class="fw-bold fs-6 mb-1" style="color: #4a3b32;">${d.name}</div>
+                            <div class="fw-bold" style="color: #8c6d53;">$${d.price}</div>
+                        </div>
+                    </div>
+                `;
+                drinkSelect.innerHTML += `<option value="${d.name}">${d.name} - $${d.price}</option>`;
+            });
 
-                <div class="card shadow p-4">
-                    <!-- AI 推薦精靈區塊 -->
-                    <div class="p-3 mb-4 border rounded-3" style="background-color: #fcf8f2; border-color: #ebd9c8 !important;">
-                        <h5 class="fw-bold mb-3" style="color: #6e523b;">✨ AI 口感推薦精靈</h5>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold mb-2">1. 點選您今天想要的感受/口感：</label>
-                            <div id="feel-buttons" class="d-flex flex-wrap gap-1 mb-2">
-                                <button type="button" class="btn btn-outline-secondary feel-btn selected" onclick="selectFeel(this, '清爽解渴')">🌿 清爽解渴</button>
-                                <button type="button" class="btn btn-outline-secondary feel-btn" onclick="selectFeel(this, '酸甜開胃')">🍋 酸甜開胃</button>
-                                <button type="button" class="btn btn-outline-secondary feel-btn" onclick="selectFeel(this, '茶香回甘')">🍃 茶香回甘</button>
-                                <button type="button" class="btn btn-outline-secondary feel-btn" onclick="selectFeel(this, '濃郁香醇')">🥛 濃郁香醇</button>
-                                <button type="button" class="btn btn-outline-secondary feel-btn" onclick="selectFeel(this, '水果清新')">🍊 水果清新</button>
-                                <button type="button" class="btn btn-outline-secondary feel-btn" onclick="selectFeel(
+            for (let i = 1; i <= 35; i++) {
+                qtySelect.innerHTML += `<option value="${i}">${i} 杯</option>`;
+            }
+        };
+
+        function pickDrink(name) {
+            document.getElementById('drink_name').value = name;
+            document.getElementById('order-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function selectFeel(btn, feelValue) {
+            document.querySelectorAll('.feel-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById('ai-feel').value = feelValue;
+        }
+
+        function getRecommendation() {
+            const feel = document.getElementById('ai-feel').value;
+            const sugar = document.getElementById('ai-sugar').value;
+            const ice = document.getElementById('ai-ice').value;
+            
+            const recommendationMap = {
+                '清爽解渴': '青檸烏龍',
+                '酸甜開胃': '金桔檸檬',
+                '茶香回甘': '桂花青茶',
+                '濃郁香醇': '黑糖鮮奶',
+                '水果清新': '鮮橙綠茶',
+                '咀嚼口感': '珍珠奶茶',
+                '想喝甜的': '焦糖奶茶'
+            };
+
+            const recommendedDrink = recommendationMap[feel] || '四季春茶';
+            const found = drinksData.find(d => d.name === recommendedDrink);
+            const price = found ? found.price : 30;
+
+            document.getElementById('recommendation-result').innerHTML = `💡 專屬推薦 [${feel}]：<b>${recommendedDrink}</b> ($${price})`;
+            
+            document.getElementById('drink_name').value = recommendedDrink;
+            document.getElementById('form-sugar').value = sugar;
+            document.getElementById('form-ice').value = ice;
+        }
+
+        document.getElementById('order-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch('/order', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('訂單建立成功！將前往狀態查詢頁面。');
+                    window.location.href = `/order/${data.token}`;
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(() => alert('送單失敗，請確認後端連線狀態'));
+        });
+    </script>
+</body>
+</html>
